@@ -1,2 +1,2 @@
 # HackathonDataAnalysis
- For the hackathon, currently working on some super duper cool stuff.
+This repo is for the 2020 Beach Blitz Hackathon (Found here: https://docs.google.com/document/d/1dguJIcROSd3ejw_2bwvIOYTnmwT0traPG0omLUn2kUI/edit).
