@@ -38,14 +38,16 @@ public class RenderableObject {
             ScreenManager.renderTexture(this.image, location, 1, this.rotation, dimensions);
     }
 
-    protected void render(Point location) {
+    protected boolean render(Point location) {
         if (EventManager.currentPhase == GameTimes.SECOND_RENDER)
             ScreenManager.renderTexture(this.image, location, 1, this.rotation, this.imageSize);
+        return false;
     }
 
-    public void render() {
+    public boolean render() {
         if (EventManager.currentPhase == GameTimes.SECOND_RENDER)
             this.render(new Point(0, 0));
+        return false;
     }
 
     protected void registerToRender() {

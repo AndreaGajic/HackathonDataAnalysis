@@ -1,11 +1,26 @@
 package src.com.github.jojo2357.analyzers;
 
-public enum CompetitionYears {
-    y2019(new String[]{"Team Number","Match Number","Starting Position","Hab Line","Auto # H Ship Side","Auto # H Ship Front","Auto # C Ship Side","Auto C Rkt Lvl","Auto H Rkt Lvl","Auto H Rkt Lvl [2]","Auto # C Dropped","Auto # H Dropped","Tele H Ship","Tele C Ship","Tele Rocket H L1","Tele Rocket H L2","Tele Rocket H L3","Tele Rocket C L1","Tele Rocket C L2","Tele Rocket C L3","Tele Dropped C","Tele Dropped H","Def pl amt","Def pl quality","Def rec amt","Who Played D","Fouls","Dead","Highest success","Highest attempt","Was assisted"});
+import java.io.File;
+import java.util.Scanner;
 
+public enum CompetitionYears {
+    y2019("Data Set/csv/2791_2019dar.csv", "2019");
+
+    public String yearNumber;
+    public String fileName;
     public String[] keyData;
 
-    CompetitionYears(String[] gameKey){
-        this.keyData = gameKey;
+    CompetitionYears(String fileName, String yearNumber) {
+        this.yearNumber = yearNumber;
+        this.fileName = fileName;
+        File inputFile = new File(fileName);
+        Scanner reader;
+        try {
+            reader = new Scanner(inputFile);
+        } catch (Exception e) {
+            throw new RuntimeException(inputFile + " could not be found");
+        }
+        keyData = reader.nextLine().split(",");
+        reader.close();
     }
 }

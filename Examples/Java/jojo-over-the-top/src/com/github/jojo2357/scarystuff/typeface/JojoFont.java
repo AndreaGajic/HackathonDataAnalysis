@@ -2,7 +2,7 @@ package src.com.github.jojo2357.scarystuff.typeface;
 
 public class JojoFont {
 
-    private static final FontCharacter[][] fontCharacters = new FontCharacter[Colors.values().length][37];
+    private static final FontCharacter[][] fontCharacters = new FontCharacter[Colors.values().length][42];
 
     public static void init() {
         loadNumbers();
@@ -16,6 +16,11 @@ public class JojoFont {
             }
             fontCharacters[color.valueOf()][36] = new FontCharacter('-', color);
         }
+        fontCharacters[Colors.WHITE.valueOf()][37] = new FontCharacter('#', Colors.WHITE);
+        fontCharacters[Colors.WHITE.valueOf()][38] = new FontCharacter("slash", '/', Colors.WHITE);
+        fontCharacters[Colors.WHITE.valueOf()][39] = new FontCharacter('[', Colors.WHITE);
+        fontCharacters[Colors.WHITE.valueOf()][40] = new FontCharacter(']', Colors.WHITE);
+        fontCharacters[Colors.WHITE.valueOf()][41] = new FontCharacter("questionMark", '?', Colors.WHITE);
     }
 
     private static void loadLetters() {
@@ -46,6 +51,32 @@ public class JojoFont {
                 throw new IllegalStateException("Probs wrong color. " + charRepresentation + "_" + color.getName() + " DNE");
             else
                 return fontCharacters[color.valueOf()][36];
+        if (charRepresentation == '#')
+            if (fontCharacters[color.valueOf()][37] == null)
+                throw new IllegalStateException("Probs wrong color. " + charRepresentation + "_" + color.getName() + " DNE");
+            else
+                return fontCharacters[color.valueOf()][37];
+        if (charRepresentation == '/' || charRepresentation == '\\')
+            if (fontCharacters[color.valueOf()][38] == null)
+                throw new IllegalStateException("Probs wrong color. " + charRepresentation + "_" + color.getName() + " DNE");
+            else
+                return fontCharacters[color.valueOf()][38];
+        if (charRepresentation == '[')
+            if (fontCharacters[color.valueOf()][39] == null)
+                throw new IllegalStateException("Probs wrong color. " + charRepresentation + "_" + color.getName() + " DNE");
+            else
+                return fontCharacters[color.valueOf()][39];
+        if (charRepresentation == ']')
+            if (fontCharacters[color.valueOf()][40] == null)
+                throw new IllegalStateException("Probs wrong color. " + charRepresentation + "_" + color.getName() + " DNE");
+            else
+                return fontCharacters[color.valueOf()][40];
+        if (charRepresentation == '?')
+            if (fontCharacters[color.valueOf()][41] == null)
+                throw new IllegalStateException("Probs wrong color. " + charRepresentation + "_" + color.getName() + " DNE");
+            else
+                return fontCharacters[color.valueOf()][41];
+
         throw new IndexOutOfBoundsException("font type for " + charRepresentation + "_" + color.getName() + " not found");
     }
 }

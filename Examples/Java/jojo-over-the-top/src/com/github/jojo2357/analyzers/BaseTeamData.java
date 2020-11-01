@@ -2,26 +2,30 @@ package src.com.github.jojo2357.analyzers;
 
 import src.com.github.jojo2357.scarystuff.RenderableObject;
 import src.com.github.jojo2357.scarystuff.TextRenderer;
-import src.com.github.jojo2357.scarystuff.events.EventBase;
 import src.com.github.jojo2357.scarystuff.events.EventPriorities;
+import src.com.github.jojo2357.scarystuff.events.EventTypes;
 import src.com.github.jojo2357.scarystuff.events.events.MouseInputEvent;
 import src.com.github.jojo2357.scarystuff.graphics.Dimensions;
 import src.com.github.jojo2357.scarystuff.graphics.IRecievesEvent;
 import src.com.github.jojo2357.scarystuff.graphics.Point;
 import src.com.github.jojo2357.scarystuff.typeface.Colors;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class BaseTeamData extends RenderableObject implements IRecievesEvent {
+    //get(team#).get(year).get(gameNumber).get(item)
     public static HashMap<String, HashMap<CompetitionYears, HashMap<String, HashMap<String, String>>>> allTeamData = new HashMap<>();
     public static HashMap<String, BaseTeamData> teamRegistrar = new HashMap<>();
-    //get(team#).get(year).get(gameNumber).get(item)
+    public static MouseInputEvent lastMouseEvent = new MouseInputEvent();
 
     public String teamNumber;
     public Point location = new Point();
     public Colors color = Colors.WHITE;
     public Dimensions dimensions;
+
+    public boolean menuOpen = false;
+    private CompetitionYears yearSelected = null;
+    private String selectedCategory = null;
 
     public BaseTeamData(String teamNumber, CompetitionYears year, HashMap<String, HashMap<String, String>> data){
         if (teamRegistrar.containsKey(teamNumber)) {
@@ -41,12 +45,48 @@ public class BaseTeamData extends RenderableObject implements IRecievesEvent {
         allTeamData.get(this.teamNumber).put(year, data);
     }
 
-    public void render(){
-        this.render(this.location);
+    public boolean render(){
+        return this.render(this.location);
     }
 
-    public void render(Point point){
+    public boolean render(Point point){
         TextRenderer.render(this.teamNumber, this.color, point, 1000);
+        return false;
+    }
+
+    private void promptYearSelect(){
+        Point startingPoint = new Point(50,50);
+        TextRenderer.render("Select a year", Colors.WHITE, startingPoint, 1000);
+        for (CompetitionYears year : CompetitionYears.values()){
+            startingPoint.stepY(50);
+            TextRenderer.render(year.yearNumber, Colors.WHITE, startingPoint, 1000);
+        }
+    }
+
+    private void promptCategorySelect(){
+        Point startingPoint = new Point(50,50);
+        TextRenderer.render("Select a category", Colors.WHITE, startingPoint, 1000);
+        for (String category : this.yearSelected.keyData){
+            startingPoint.stepY(50);
+            TextRenderer.render(category, Colors.WHITE, startingPoint, 1000);
+        }
+    }
+
+    public void printAllGames(){
+        if (yearSelected == null){
+            promptYearSelect();
+            return;
+        }
+        if (selectedCategory == null){
+            promptCategorySelect();
+            return;
+        }
+        Point startingPoint = new Point(50,50);
+        TextRenderer.render(selectedCategory, Colors.WHITE, startingPoint, 1000);
+        for (HashMap<String,String> game : allTeamData.get(this.teamNumber).get(yearSelected).values()){
+            startingPoint.stepY(50);
+            TextRenderer.render(game.get(selectedCategory), Colors.WHITE, startingPoint, 1000);
+        }
     }
 
     @Override
@@ -56,9 +96,45 @@ public class BaseTeamData extends RenderableObject implements IRecievesEvent {
 
     @Override
     public boolean handleMouseInput(MouseInputEvent event) {
+        int lastClick = -1;
+        for (int mouseChecker = 0; mouseChecker <= 2; mouseChecker++) {
+            if ((event.getRawData() & (4 >> mouseChecker)) == 4 >> mouseChecker) {
+                lastClick = 2 - mouseChecker;
+            }
+        }
+        if (this.menuOpen){
+            if (this.yearSelected == null && lastClick == 0){
+                Point checkPos = new Point(50, 100);
+                for (CompetitionYears year : CompetitionYears.values()){
+                    if (event.getPosition().isInBoundingBox(checkPos.copy().stepX(year.yearNumber.length() * 10), new Dimensions(year.yearNumber.length() * 20 + 10, 30), 0.5f)){
+                        this.yearSelected = year;
+                        return true;
+                    }
+                    checkPos.stepY(50);
+                }
+                return true;
+            }
+            if (this.selectedCategory == null && lastClick == 0){
+                Point checkPos = new Point(50, 100);
+                for (String category : this.yearSelected.keyData){
+                    if (event.getPosition().isInBoundingBox(checkPos.copy().stepX(category.length() * 10), new Dimensions(category.length() * 20 + 10, 30), 0.5f)){
+                        this.selectedCategory = category;
+                        return true;
+                    }
+                    checkPos.stepY(50);
+                }
+                return true;
+            }
+            this.printAllGames();
+            return true;
+        }
         if (event.getPosition().isInBoundingBox(this.location.copy().stepX(this.dimensions.getWidth()/2).stepY(/*-this.dimensions.getHeight()/2*/ 0), this.dimensions, 0.5f)) {
             this.color = Colors.YELLOW;
             System.out.println(this.location.toString() + ": " + this.dimensions.toString());
+            if (event.getRawData() == 0)
+                return false;
+            if (lastClick == 0)
+                return this.menuOpen = true;
         }else
             this.color = Colors.WHITE;
         return false;
@@ -66,6 +142,8 @@ public class BaseTeamData extends RenderableObject implements IRecievesEvent {
 
     @Override
     public EventPriorities getPrio(int id) {
+        if ((EventTypes.MouseInputEvent.getId() == id || EventTypes.RenderEvent.getId() == id) && this.menuOpen)
+            return EventPriorities.MIDDLE;
         return EventPriorities.LOWEST;
     }
 }

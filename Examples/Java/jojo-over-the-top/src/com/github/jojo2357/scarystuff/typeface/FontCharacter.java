@@ -13,6 +13,12 @@ public class FontCharacter {
         this.image = new Texture(color.getName() + "/" + strRepresentation + "_" + color.getName());
     }
 
+    public FontCharacter(String fileName, char strRepresentation, Colors color) {
+        this.stringRep = strRepresentation;
+        this.color = color;
+        this.image = new Texture(color.getName() + "/" + fileName + "_" + color.getName());
+    }
+
     public char getStringRep() {
         return stringRep;
     }

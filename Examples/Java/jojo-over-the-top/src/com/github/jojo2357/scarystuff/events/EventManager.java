@@ -5,12 +5,9 @@ import src.com.github.jojo2357.scarystuff.RenderableObject;
 import src.com.github.jojo2357.scarystuff.TextRenderer;
 import src.com.github.jojo2357.scarystuff.events.events.RenderEvent;
 import src.com.github.jojo2357.scarystuff.events.events.TickEvent;
-import src.com.github.jojo2357.scarystuff.graphics.Dimensions;
 import src.com.github.jojo2357.scarystuff.graphics.IRecievesEvent;
 import src.com.github.jojo2357.scarystuff.graphics.Point;
 import src.com.github.jojo2357.scarystuff.graphics.ScreenManager;
-import src.com.github.jojo2357.scarystuff.typeface.Colors;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +23,9 @@ public class EventManager {
     private static boolean configured = false;
 
     public static void init() {
-        for (int fillRegisteredListener = 0; fillRegisteredListener < EventTypes.values().length; fillRegisteredListener++)
+        for (int fillRegisteredListener = 0; fillRegisteredListener < EventTypes.values().length; fillRegisteredListener++) {
             registeredListeners.add(new ArrayList<IRecievesEvent>());
+        }
         configured = true;
     }
 
@@ -35,7 +33,7 @@ public class EventManager {
         //System.out.println(event.getEventType().getName() + " gotten!");
         if (event instanceof RenderEvent) {
             boolean toClose = ScreenManager.tick();
-            ScreenManager.drawBox(new Point(10,10), new Point(30, 30), 255, 255, 255);
+            ScreenManager.drawBox(new Point(10, 10), new Point(30, 30), 255, 255, 255);
             for (GameTimes gameTime : GameTimes.values()) {
                 if (gameTime.name().contains("RENDER")) {
                     currentPhase = gameTime;
@@ -46,14 +44,14 @@ public class EventManager {
             ScreenManager.finishRender();
             currentPhase = GameTimes.WAITING;
             return toClose;
-        }else
+        } else {
             events.add(event);
+        }
         return false;
     }
 
     public static <T extends IRecievesEvent> void addListeningObject(T listeningObject, EventTypes eventToListenFor) {
-        if (!configured)
-            init();
+        if (!configured) init();
         registeredListeners.get(eventToListenFor.getId()).add(listeningObject);
     }
 
@@ -81,40 +79,49 @@ public class EventManager {
                 }
             } else {
                 for (RenderableObject obj : renderableObjects) {
-                    obj.render();
+                    if (obj.render()) break;
                 }
                 drawNumbers();
             }
             events.remove(0);
             loopsMade++;
             if (loopsMade > maxLoops)// debug because reasons
+            {
                 throw new RuntimeException("Infinite loop?");
+            }
         }
     }
 
     public static void sendTickEvent() {
-        if (!configured)
-            EventManager.init();
+        if (!configured) EventManager.init();
         currentPhase = GameTimes.TICK;
-        for (IRecievesEvent room : registeredListeners.get(EventTypes.TickEvent.getId()))
+        for (IRecievesEvent room : registeredListeners.get(EventTypes.TickEvent.getId())) {
             room.notify(staticTickEvent);
+        }
     }
 
     public static <T extends RenderableObject> void addRenderingObject(T object) {
         EventManager.renderableObjects.add(object);
     }
 
-    private static void drawNumbers(){
+    private static void drawNumbers() {
         Point drawSpot = new Point(50, 50);
-        for (BaseTeamData team : BaseTeamData.teamRegistrar.values()){
-            TextRenderer.render(team.teamNumber, team.color, drawSpot, 1000);
-            team.location = drawSpot.copy();
-            drawSpot.stepX(team.teamNumber.length() * 20 + 10);
-            if (drawSpot.getX() > 1100){
-                drawSpot.stepX(50 - (int) drawSpot.getX());
-                drawSpot.stepY(50);
+        for (EventPriorities prio : EventPriorities.values()) {
+            for (BaseTeamData team : BaseTeamData.teamRegistrar.values()) {
+                if (team.getPrio(EventTypes.RenderEvent.getId()) == prio) {
+                    if (prio == EventPriorities.MIDDLE){
+                        team.printAllGames();
+                        return;
+                    }
+                    TextRenderer.render(team.teamNumber, team.color, drawSpot, 1000);
+                    team.location = drawSpot.copy();
+                    drawSpot.stepX(team.teamNumber.length() * 20 + 10);
+                    if (drawSpot.getX() > 1100) {
+                        drawSpot.stepX(50 - (int) drawSpot.getX());
+                        drawSpot.stepY(50);
+                    }
+                }
             }
-
         }
     }
 }
