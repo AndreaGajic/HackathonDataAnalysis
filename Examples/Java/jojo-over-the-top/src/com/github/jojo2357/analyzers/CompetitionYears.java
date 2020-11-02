@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.Scanner;
 
 public enum CompetitionYears {
+    y2015("Data Set/csv/3476_2015cc.csv", "2015"),
     y2019("Data Set/csv/2791_2019dar.csv", "2019");
+
 
     public String yearNumber;
     public String fileName;

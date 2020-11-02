@@ -1,6 +1,7 @@
 package src.com.github.jojo2357;
 
-import src.com.github.jojo2357.analyzers.Analyze2019;
+import src.com.github.jojo2357.analyzers.Analyze;
+import src.com.github.jojo2357.analyzers.CompetitionYears;
 import src.com.github.jojo2357.scarystuff.events.EventManager;
 import src.com.github.jojo2357.scarystuff.events.events.RenderEvent;
 import src.com.github.jojo2357.scarystuff.graphics.ScreenManager;
@@ -15,8 +16,10 @@ class HackathonMain {
     private static double frameLength = 1000/fps;
 
     public static void main(String args[]) throws Exception{
-        String fileData = readFromFile(/*args[0]*/"Data Set/csv/2791_2019dar.csv");
-        Analyze2019.analyze(fileData);
+        for (CompetitionYears year : CompetitionYears.values()) {
+            String fileData = readFromFile(year.fileName);
+            Analyze.analyze(fileData, year);
+        }
         long last;
         int totalSkips = 0;
         ScreenManager.init();

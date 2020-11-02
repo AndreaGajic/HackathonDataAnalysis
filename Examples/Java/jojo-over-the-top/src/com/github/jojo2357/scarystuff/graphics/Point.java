@@ -88,4 +88,14 @@ public class Point {
     public String toString(){
         return "Point (" + this.x + ", " + this.y + ")";
     }
+
+    public Point setX(float x){
+        this.x = x;
+        return this;
+    }
+
+    public Point setY(float y){
+        this.y = y;
+        return this;
+    }
 }
